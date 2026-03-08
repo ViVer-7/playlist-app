@@ -1,2 +1,14 @@
+# .env
+.env.local
+.env.*.local
+
+.angular/
 .DS_Store
-.angular
+.vscode/
+
+dist/
+node_modules/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

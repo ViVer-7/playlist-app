@@ -1,49 +1,79 @@
 <div class="grid-cols-1 gap-4 p-4 justify-center container mx-auto my-auto">
-    <span class="text-9xl text-white">Axxes</span>
+    <span class="text-9xl text-white">Playlist</span>
 </div>
 <div class="grid md:grid-cols-2 gap-4 p-4 justify-center container mx-auto h-screen my-auto">
     <div class="border-2 border-orange-500 rounded-md w-full">
         <div class="flex flex-col gap-2 p-4">
             <div class="text-4xl text-white font-bold py-2">Songs</div>
-            <input type="search" class="w-full rounded border-2 border-orange-500 bg-transparent p-2 text-base text-white placeholder-white" id="1" (input)="findSongs($event.target)"  placeholder="Find songs..." />
-            <div *ngFor="let song of songs" class="p-2 rounded-lg border-2 border-gray-500">
-                <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
-                    <li class="p-2">
-                        <div class="flex items-center space-x-4">
-                            <div class="flex-shrink-0">
-                                <img class="w-12 h-12 rounded-md" width='1' height='1' [ngSrc]="song['albumImage']" />
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="text-sm font-medium text-gray-300 truncate dark:text-white">{{ song['name'] }}</div>
-                                <div class="text-sm text-gray-500 truncate dark:text-gray-400">{{ song['artist'] }}</div>
-                            </div>
-                            <button (click)="saveSong(song)" class="hover:cursor-pointer rounded font-bold text-black bg-white  p-2 px-3">Add</button>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+            <input
+                class="w-full rounded border-2 border-orange-500 bg-transparent p-2 text-base text-white placeholder-white"
+                placeholder="Find songs..."
+                type="search"
+                (input)="findSongs($event.target)"
+            />
+            @if (loading()) {
+                <div class="flex justify-center py-8">
+                    <span class="spinner !w-6 !h-6 !border-orange-500 !border-r-transparent"></span>
+                </div>
+            } @else {
+                @for (song of songs(); track song.id) {
+                <app-song-card [song]="song" (selected)="selectSong(song)">
+                    <button
+                        class="rounded font-bold p-2 px-3 min-w-[4rem]"
+                        [class]="savedIds().has(song.id) || savingIds().has(song.id)
+                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                            : 'bg-white text-black hover:cursor-pointer'"
+                        (click)="saveSong(song); $event.stopPropagation()"
+                        [disabled]="savedIds().has(song.id) || savingIds().has(song.id)"
+                    >
+                        @if (savingIds().has(song.id)) {
+                            <span class="spinner"></span>
+                        } @else {
+                            Add
+                        }
+                    </button>
+                </app-song-card>
+                }
+            }
         </div>
     </div>
-    <div class="border-2 border-orange-500 rounded-md w-full pt-2">
+    <div class="border-2 border-orange-500 rounded-md w-full">
         <div class="flex flex-col h-full gap-2 p-4">
             <div class="text-4xl text-white font-bold py-2">Saved</div>
-            <input type="search" class="w-full rounded border-2 border-orange-500 bg-transparent p-2 text-base text-white placeholder-white" id="2" (input)="findSongsSaved($event.target)" placeholder="Find saved songs..." />
-            <div *ngFor="let song of saved" class="p-2 rounded-lg border-2 border-gray-500">
-                <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
-                    <li class="p-2">
-                        <div class="flex items-center space-x-4">
-                            <div class="flex-shrink-0">
-                                <img class="w-12 h-12 rounded-md" [src]="song['albumImage']" />
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="text-sm font-medium text-gray-300 truncate dark:text-white">{{ song['name'] }}</div>
-                                <div class="text-sm text-gray-500 truncate dark:text-gray-400">{{ song['artist'] }}</div>
-                            </div>
-                            <button (click)="deleteSong(song)" class="hover:cursor-pointer font-bold text-white bg-orange-500 rounded py-2 px-3">Delete</button>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+            <input
+                class="w-full rounded border-2 border-orange-500 bg-transparent p-2 text-base text-white placeholder-white"
+                placeholder="Find saved songs..."
+                type="search"
+                (input)="findSongsSaved($event.target)"
+            />
+            @if (loading()) {
+                <div class="flex justify-center py-8">
+                    <span class="spinner !w-6 !h-6 !border-orange-500 !border-r-transparent"></span>
+                </div>
+            } @else {
+                @for (song of saved(); track song.id) {
+                <app-song-card [song]="song" (selected)="selectSong(song)">
+                    <button
+                        class="font-bold rounded py-2 px-3 min-w-[5rem]"
+                        [class]="deletingIds().has(song.id)
+                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                            : 'text-white bg-orange-500 hover:cursor-pointer'"
+                        (click)="deleteSong(song); $event.stopPropagation()"
+                        [disabled]="deletingIds().has(song.id)"
+                    >
+                        @if (deletingIds().has(song.id)) {
+                            <span class="spinner"></span>
+                        } @else {
+                            Delete
+                        }
+                    </button>
+                </app-song-card>
+                }
+            }
         </div>
     </div>
 </div>
+
+@if (selectedSong()) {
+    <app-song-detail [song]="selectedSong()!" (close)="closeDetail()" />
+}

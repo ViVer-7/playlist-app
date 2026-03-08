@@ -1,56 +1,94 @@
-import {Component, OnInit} from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import {CommonModule, NgOptimizedImage} from "@angular/common";
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from "@angular/core";
+import { Song } from "./song.model";
+import { SongDetailComponent } from "./song-detail.component";
+import { SongCardComponent } from "./song-card.component";
+import { SongService } from "./song.service";
 
 @Component({
-    selector: "app-home",
-    templateUrl: "./home.component.html",
-    imports: [CommonModule, NgOptimizedImage],
-    standalone: true
+  selector: "app-home",
+  templateUrl: "./home.component.html",
+  imports: [SongCardComponent, SongDetailComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-
-
 export class HomeComponent implements OnInit {
-  songs: Record<any, any>[] = [];
-  saved: Record<any, any>[] = [];
-  authToken;
+  private readonly songService = inject(SongService);
 
-  constructor(private http: HttpClient) {
-    this.authToken = this.getAuthToken();
-  }
+  songs = signal<Song[]>([]);
+  saved = signal<Song[]>([]);
+  savedIds = signal(new Set<string>());
+  savingIds = signal(new Set<string>());
+  deletingIds = signal(new Set<string>());
+  selectedSong = signal<Song | null>(null);
+  loading = signal(true);
 
   ngOnInit() {
-    this.getSongs();
+    this.loadAll();
   }
 
-  getAuthToken() {
-    let atc = document.cookie.split(";").find((cookie) => cookie.trim().startsWith("authToken"));
-    return atc?.split("=")[1] || null;
+  async loadAll() {
+    const [savedResponse, songsResponse] = await Promise.all([
+      this.songService.getSaved(),
+      this.songService.getSongs(),
+    ]);
+    this.saved.set(savedResponse);
+    this.songs.set(songsResponse);
+    this.savedIds.set(new Set(savedResponse.map((s) => s.id)));
+    this.loading.set(false);
   }
 
-  async getSongs() {
-    const savedResponse = await this.http.get<any>(`http://localhost:4000/saved?authToken=${this.authToken}`).toPromise();
-    const songsResponse = await this.http.get<any>(`http://localhost:4000/songs?authToken=${this.authToken}`).toPromise();
-    this.saved = savedResponse;
-    this.songs = songsResponse;
+  async saveSong(song: Song) {
+    if (this.savingIds().has(song.id)) {
+      return;
+    }
+
+    this.savingIds.update((ids) => new Set(ids).add(song.id));
+    
+    try {
+      await this.songService.addSaved(song);
+      await this.loadAll();
+    } finally {
+      this.savingIds.update((ids) => {
+        const next = new Set(ids);
+        next.delete(song.id);
+        return next;
+      });
+    }
   }
 
-  async saveSong(song: any) {
-    await this.http.post(`http://localhost:4000/saved?authToken=${this.authToken}`, song).toPromise();
+  async deleteSong(song: Song) {
+    if (this.deletingIds().has(song.id)) {
+      return;
+    }
+
+    this.deletingIds.update((ids) => new Set(ids).add(song.id));
+    
+    try {
+      await this.songService.removeSaved(song.id);
+      await this.loadAll();
+    } finally {
+      this.deletingIds.update((ids) => {
+        const next = new Set(ids);
+        next.delete(song.id);
+        return next;
+      });
+    }
   }
 
-  async deleteSong(song: any) {
-    await this.http.delete(`http://localhost:4000/saved?authToken=${this.authToken}`, {body: song}).toPromise();
+  async findSongs(target: EventTarget | null) {
+    const query = (target as HTMLInputElement).value;
+    this.songs.set(await this.songService.getSongs(query));
   }
 
-  async findSongs(query: any) {
-    const response = await this.http.get<any>(`http://localhost:4000/songs?name=${query.value}&authToken=${this.authToken}`).toPromise();
-    this.songs = response;
+  async findSongsSaved(target: EventTarget | null) {
+    const query = (target as HTMLInputElement).value;
+    this.saved.set(await this.songService.getSaved(query));
   }
 
-  async findSongsSaved(query: any) {
-    const response = await this.http.get<any>(`http://localhost:4000/saved?name=${query}&authToken=${this.authToken}`).toPromise();
-    this.saved = response;
+  selectSong(song: Song) {
+    this.selectedSong.set(song);
+  }
 
+  closeDetail() {
+    this.selectedSong.set(null);
   }
 }

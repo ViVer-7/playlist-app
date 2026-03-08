@@ -1,18 +1,31 @@
 ## Welcome!
-Please see the  **Frontend Assessment.pdf** for all the information about your assessment.
-Below is just a quick overview to get you up and running. Good luck!
+Onze passie ligt niet alleen bij de techniek maar ook bij muziek. De hele
+dag door klinkt er heerlijke muziek door de speakers. Om iedereen tevreden te
+houden willen wij een Spotify-achtige app laten maken waarbij er een afspeellijst
+kan worden samengesteld met muzieknummers. Zo kunnen we iedereen binnen
+het bedrijf tevreden houden.
 
+Onze stagiair Angelo is gestart met het project, maar heeft het helaas niet kunnen
+afronden. We verwachten van jou dat je het project afmaakt en productie-waardig
+oplevert.
 
 ## Required Functionality
 
 Make sure the application meets the following core requirements:
+- [ ] Login met email en wachtwoord
+- [ ] Tonen van een lijst van beschikbare nummers
+- [ ] Voeg een nummer toe aan de afspeellijst
+- [ ] Verwijder een nummer van de afspeellijst
+- [ ] Zoek functionaliteit in beide lijsten
 
-- [ ] Log in with email and password (API is already available)
-- [ ] Display a list of available songs
-- [ ] Add songs to a “saved” list
-- [ ] Remove songs from the “saved” list
-- [ ] Search functionality in both lists
-- [ ] Improve the excisting code to modern standards, make it production ready.
+Zou je deze onderdelen kunnen nalopen om te controleren of ze correct werken?
+Daarnaast willen we graag een extra feature toevoegen:
+- [ ] De API levert aanvullende informatie over de nummers. We zouden graag zien dat deze informatie ook zichtbaar wordt voor de gebruiker, bijvoorbeeld via een pop-up of een aparte detailpagina. Dit mag je naar eigen inzicht vormgeven.
+
+Verder verwachten we het volgende:
+- [ ] De software is geschreven in Typescript met gebruik van Angular.
+- [ ] Besteed niet meer dan 8 uur aan de opdracht. Als er daarna nog werk te doen is, noteer dit dan in de README, zodat we het kunnen bespreken
+- [ ] Dat je de opdracht 1 dag vóór je sollicitatiegesprek zo goed als afgerond hebt, zodat wij deze alvast kunnen bekijken
 
 ## Run the application
 From the frontend directory, install both the FE and BE packages:
@@ -44,7 +57,7 @@ The backend api runs at [http://localhost:4000](http://localhost:4000)
 
 ### Login credentials
 
-**email**: test@axxes.com
+**email**: test@test.com
 **password**: test
 
 
