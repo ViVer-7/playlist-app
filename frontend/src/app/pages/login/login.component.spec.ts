@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 import { Router } from '@angular/router';
 import { LoginComponent } from './login.component';
-import { AuthService } from './auth.service';
+import { AuthService } from '../../core/auth.service';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;

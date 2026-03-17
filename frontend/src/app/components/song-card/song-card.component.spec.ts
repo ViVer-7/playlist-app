@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 import { SongCardComponent } from './song-card.component';
-import { Song } from './song.model';
+import { Song } from '../../models/song.model';
 
 function mockSong(overrides: Partial<Song> = {}): Song {
   return {

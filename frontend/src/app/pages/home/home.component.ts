@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from "@angular/core";
-import { Song } from "./song.model";
-import { SongDetailComponent } from "./song-detail.component";
-import { SongCardComponent } from "./song-card.component";
-import { SongService } from "./song.service";
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from "@angular/core";
+import { Song } from "../../models/song.model";
+import { SongDetailComponent } from "../../components/song-detail/song-detail.component";
+import { SongCardComponent } from "../../components/song-card/song-card.component";
+import { SongService } from "../../core/song.service";
 
 @Component({
   selector: "app-home",
@@ -15,25 +15,31 @@ export class HomeComponent implements OnInit {
 
   songs = signal<Song[]>([]);
   saved = signal<Song[]>([]);
-  savedIds = signal(new Set<string>());
+  savedIds = computed(() => new Set(this.saved().map((s) => s.id)));
   savingIds = signal(new Set<string>());
   deletingIds = signal(new Set<string>());
   selectedSong = signal<Song | null>(null);
   loading = signal(true);
+  error = signal("");
 
   ngOnInit() {
     this.loadAll();
   }
 
   async loadAll() {
-    const [savedResponse, songsResponse] = await Promise.all([
-      this.songService.getSaved(),
-      this.songService.getSongs(),
-    ]);
-    this.saved.set(savedResponse);
-    this.songs.set(songsResponse);
-    this.savedIds.set(new Set(savedResponse.map((s) => s.id)));
-    this.loading.set(false);
+    try {
+      const [savedResponse, songsResponse] = await Promise.all([
+        this.songService.getSaved(),
+        this.songService.getSongs(),
+      ]);
+      this.saved.set(savedResponse);
+      this.songs.set(songsResponse);
+      this.error.set("");
+    } catch {
+      this.error.set("Failed to load songs. Please try again.");
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   async saveSong(song: Song) {
@@ -46,6 +52,8 @@ export class HomeComponent implements OnInit {
     try {
       await this.songService.addSaved(song);
       await this.loadAll();
+    } catch {
+      this.error.set("Failed to save song. Please try again.");
     } finally {
       this.savingIds.update((ids) => {
         const next = new Set(ids);
@@ -65,6 +73,8 @@ export class HomeComponent implements OnInit {
     try {
       await this.songService.removeSaved(song.id);
       await this.loadAll();
+    } catch {
+      this.error.set("Failed to delete song. Please try again.");
     } finally {
       this.deletingIds.update((ids) => {
         const next = new Set(ids);

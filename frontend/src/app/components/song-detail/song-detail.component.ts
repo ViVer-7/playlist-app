@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from "@angular/core";
-import { Song } from "./song.model";
-import { environment } from "../environments/environment";
+import { Song } from "../../models/song.model";
+import { environment } from "../../../environments/environment";
 
 @Component({
   selector: "app-song-detail",

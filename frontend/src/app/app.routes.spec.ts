@@ -1,7 +1,7 @@
 import { routes } from './app.routes';
-import { LoginComponent } from './login.component';
-import { HomeComponent } from './home.component';
-import { authGuard } from './auth.guard';
+import { LoginComponent } from './pages/login/login.component';
+import { HomeComponent } from './pages/home/home.component';
+import { authGuard } from './core/auth.guard';
 
 describe('App Routes', () => {
   it('should map empty path to LoginComponent', () => {

@@ -1,8 +1,8 @@
 import { inject, Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { firstValueFrom } from "rxjs";
-import { Song } from "./song.model";
-import { environment } from "../environments/environment";
+import { Song } from "../models/song.model";
+import { environment } from "../../environments/environment";
 
 @Injectable({ providedIn: "root" })
 export class SongService {
